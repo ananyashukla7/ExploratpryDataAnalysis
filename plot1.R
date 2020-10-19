@@ -1,14 +1,21 @@
-## read in emissions data and classification code
-emissions_data <- readRDS("summarySCC_PM25.rds")
-class_code <- readRDS("Source_Classification_Code.rds")
+head(NEI) # Observe what is inside the dataset
+tot.emissions.year <- NEI %>%  # Group by year and summarize total emissions across the board
+    group_by(year) %>%
+    summarize(Total.Emissions = sum(Emissions, na.rm = TRUE))
 
-## add up the total emissions for each year
-sum_by_year <- aggregate(emissions_data$Emissions, by=list(year=emissions_data$year), FUN=sum)
+tot.emissions.year
+with(tot.emissions.year, # plot data 
+     plot(x = year, 
+          y = Total.Emissions, 
+          ylab = "Total Annual Emissions [Tons]", 
+          xlab = "Year",
+          main = "Total Annual Emissions in the US by Year",
+          cex = 2,
+          pch = 2,
+          col = "red",
+          lwd = 3))
+# Find delta between 2008 and 1999
+tot.emissions.2008 <- tot.emissions.year[tot.emissions.year$year == 2008, 2]
+tot.emissions.1999 <- tot.emissions.year[tot.emissions.year$year == 1999, 2]
 
-## create the plot
-png(filename = "plot1.png")
-plot(sum_by_year$year, sum_by_year$x, type = "l", 
-     main = "Total Emissions of PM2.5 in Baltimore City",
-     ylab = "Total emissions of PM2.5 (tons)",
-     xlab = "Year")
-dev.off()
+delta.tot.emissions <- tot.emissions.2008 - tot.emissions.1999
